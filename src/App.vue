@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import CameraControl from "./components/CameraControl.vue";
+</script>
+
 <template>
-  <div>All vite default files has been removed 👌</div>
+  <div><CameraControl /></div>
 </template>
