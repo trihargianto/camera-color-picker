@@ -1,9 +1,4 @@
-<div style="display: flex; align-items: center; margin-bottom:10px;">
-  <img src="src/assets/what-color-logo.png" width="30" /> 
-  <span style="font-size: 28px; display: inline-block; margin-left: 6px">What Color</span>
-</div>
-
-<hr />
+# <img src="src/assets/what-color-logo.png" width="30" /> What Color
 
 This tool aims to answer "What Color is this?" question.
 
