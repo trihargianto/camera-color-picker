@@ -10,7 +10,12 @@
           {{ capturedColorName }}
         </ColorTooltip>
 
-        <video ref="videoRef" autoplay playsinline class="w-full" />
+        <video
+          ref="videoRef"
+          autoplay
+          playsinline
+          class="w-full rounded-2xl sm:rounded-xl"
+        />
       </div>
 
       <button
@@ -43,42 +48,63 @@ const { capturedColorName, capturedColorHex } = useColorCapture(capturedImage);
 function useCamera() {
   const isFrontCamera = ref<boolean>(false);
   const capturedImage = ref<ImageCapture | null>(null);
+  const mediaStream = ref<MediaStream | undefined>(undefined);
 
-  onMounted(async () => {
-    const mediaStream = await openCamera();
-
-    setCapturedImage(mediaStream);
-    setVideoSrcObject(mediaStream);
+  onMounted(() => {
+    startCamera();
   });
 
-  function setCapturedImage(mediaStream: MediaStream | undefined) {
-    if (mediaStream) {
-      const mediaStreamTrack = mediaStream.getVideoTracks()[0];
+  function flipCamera() {
+    isFrontCamera.value = !isFrontCamera.value;
+
+    restartCamera();
+  }
+
+  function restartCamera() {
+    stopCamera();
+    startCamera();
+  }
+
+  async function startCamera() {
+    try {
+      mediaStream.value = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: isFrontCamera.value ? "user" : "environment",
+        },
+      });
+
+      setCapturedImage();
+      setVideoSrcObject();
+    } catch (error) {
+      console.error("getUserMedia() error: ", error);
+    }
+  }
+
+  function stopCamera() {
+    if (mediaStream.value) {
+      mediaStream.value.getTracks().forEach((track) => track.stop());
+    }
+
+    if (capturedImage.value) {
+      capturedImage.value = null;
+    }
+
+    if (videoRef.value) {
+      videoRef.value.srcObject = null;
+    }
+  }
+
+  function setCapturedImage() {
+    if (mediaStream.value) {
+      const mediaStreamTrack = mediaStream.value.getVideoTracks()[0];
 
       capturedImage.value = new ImageCapture(mediaStreamTrack);
     }
   }
 
-  function setVideoSrcObject(mediaStream: MediaStream | undefined) {
-    if (mediaStream && videoRef.value) {
-      videoRef.value.srcObject = mediaStream;
-    }
-  }
-
-  function flipCamera() {
-    window.alert("Didn't work :(");
-    isFrontCamera.value = !isFrontCamera.value;
-  }
-
-  async function openCamera(): Promise<MediaStream | undefined> {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: isFrontCamera.value ? "user" : "environment" },
-      });
-
-      return mediaStream;
-    } catch (error) {
-      console.error("getUserMedia() error: ", error);
+  function setVideoSrcObject() {
+    if (mediaStream.value && videoRef.value) {
+      videoRef.value.srcObject = mediaStream.value;
     }
   }
 
