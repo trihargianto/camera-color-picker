@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <div class="w-full flex justify-center">
-      <canvas ref="canvasRef" />
+      <canvas ref="canvasRef" class="hidden" />
 
       <div class="relative">
         <ColorTooltip :hex-color="capturedColorHex" />
