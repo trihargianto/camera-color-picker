@@ -70,6 +70,8 @@ function useCamera() {
       mediaStream.value = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: isFrontCamera.value ? "user" : "environment",
+          width: 1280,
+          height: 1280,
         },
       });
 
