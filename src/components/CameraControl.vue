@@ -1,6 +1,8 @@
 <template>
-  <div class="container mx-auto">
-    <div class="w-full flex justify-center">
+  <div class="container mx-auto flex justify-center">
+    <div
+      class="w-full sm:w-[600px] flex justify-center flex-col px-6 items-center"
+    >
       <canvas ref="canvasRef" class="hidden" />
 
       <div class="relative">
@@ -10,6 +12,13 @@
 
         <video ref="videoRef" autoplay playsinline class="w-full" />
       </div>
+
+      <button
+        class="mt-4 inline-flex items-center justify-center rounded-md px-3 py-2 text-xs sm:text-sm font-semibold shadow-sm text-white bg-blue-600 hover:bg-blue-500 w-24 sm:w-32"
+        @click="flipCamera()"
+      >
+        Flip Camera
+      </button>
     </div>
   </div>
 </template>
@@ -28,10 +37,11 @@ defineOptions({
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
-const { capturedImage } = useCamera();
+const { capturedImage, flipCamera } = useCamera();
 const { capturedColorName, capturedColorHex } = useColorCapture(capturedImage);
 
 function useCamera() {
+  const isFrontCamera = ref<boolean>(false);
   const capturedImage = ref<ImageCapture | null>(null);
 
   onMounted(async () => {
@@ -55,10 +65,15 @@ function useCamera() {
     }
   }
 
+  function flipCamera() {
+    window.alert("Didn't work :(");
+    isFrontCamera.value = !isFrontCamera.value;
+  }
+
   async function openCamera(): Promise<MediaStream | undefined> {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { facingMode: isFrontCamera.value ? "user" : "environment" },
       });
 
       return mediaStream;
@@ -67,7 +82,7 @@ function useCamera() {
     }
   }
 
-  return { capturedImage };
+  return { capturedImage, flipCamera };
 }
 
 function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
