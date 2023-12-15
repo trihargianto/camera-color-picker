@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <div class="w-full flex justify-center">
-      <canvas ref="canvasRef" class="hidden" />
+      <canvas ref="canvasRef" />
 
       <div class="relative">
         <ColorTooltip :hex-color="capturedColorHex" />
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
 import { rgbToHex } from "../utils/rgbToHex";
 import ColorTooltip from "./ColorTooltip.vue";
@@ -25,75 +25,108 @@ defineOptions({
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
-const capturedImage = ref<any>();
-const capturedColor = ref<{ r: number; g: number; b: number }>({
-  r: 0,
-  g: 0,
-  b: 0,
-});
+const { capturedImage } = useCamera();
+const { capturedColorHex } = useColorCapture(capturedImage);
 
-const capturedColorHex = computed(() => {
-  const { r, g, b } = capturedColor.value;
+function useCamera() {
+  const capturedImage = ref<ImageCapture | null>(null);
 
-  return rgbToHex(r, g, b);
-});
+  onMounted(async () => {
+    const mediaStream = await openCamera();
 
-onMounted(() => {
-  openCamera();
+    setCapturedImage(mediaStream);
+    setVideoSrcObject(mediaStream);
+  });
 
-  setInterval(() => {
-    captureCamera();
-  }, 500);
-});
-
-function openCamera() {
-  navigator.mediaDevices
-    .getUserMedia({ video: true })
-    .then((mediaStream: MediaStream) => {
+  function setCapturedImage(mediaStream: MediaStream | undefined) {
+    if (mediaStream) {
       const mediaStreamTrack = mediaStream.getVideoTracks()[0];
 
-      // @ts-ignore-next
       capturedImage.value = new ImageCapture(mediaStreamTrack);
+    }
+  }
 
-      if (videoRef.value) {
-        videoRef.value.srcObject = mediaStream;
-      }
-    })
-    .catch((error) => {
+  function setVideoSrcObject(mediaStream: MediaStream | undefined) {
+    if (mediaStream && videoRef.value) {
+      videoRef.value.srcObject = mediaStream;
+    }
+  }
+
+  async function openCamera(): Promise<MediaStream | undefined> {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+
+      return mediaStream;
+    } catch (error) {
       console.error("getUserMedia() error: ", error);
-    });
+    }
+  }
+
+  return { capturedImage };
 }
 
-function captureCamera() {
-  const canvas = canvasRef.value;
+function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
+  const capturedColor = ref<{ r: number; g: number; b: number }>({
+    r: 0,
+    g: 0,
+    b: 0,
+  });
 
-  if (canvas && capturedImage.value) {
-    capturedImage.value.grabFrame().then((imageBitmap: ImageBitmap) => {
-      canvas.width = imageBitmap.width;
-      canvas.height = imageBitmap.height;
+  const capturedColorHex = computed(() => {
+    const { r, g, b } = capturedColor.value;
 
-      const ctx = canvas.getContext("2d");
+    return rgbToHex(r, g, b);
+  });
 
-      if (ctx) {
-        ctx.drawImage(imageBitmap, 0, 0);
+  const intervalId = ref<number | null>(null);
 
-        const centeredXCoordinate = canvas.width / 2;
-        const centeredYCoordinate = canvas.height / 2;
+  onMounted(() => {
+    intervalId.value = setInterval(() => {
+      setRGBColorFromCanvas();
+    }, 500);
+  });
 
-        const imageData = ctx.getImageData(
-          centeredXCoordinate,
-          centeredYCoordinate,
-          1,
-          1
-        ).data;
+  onUnmounted(() => {
+    if (intervalId.value) {
+      clearInterval(intervalId.value);
+    }
+  });
 
-        capturedColor.value = {
-          r: imageData[0],
-          g: imageData[1],
-          b: imageData[2],
-        };
+  async function setRGBColorFromCanvas() {
+    try {
+      if (canvasRef.value && capturedImage.value) {
+        const imageBitmap = await capturedImage.value.grabFrame();
+
+        const canvas = canvasRef.value;
+
+        canvas.width = imageBitmap.width;
+        canvas.height = imageBitmap.height;
+
+        const canvasContext2d = canvas.getContext("2d");
+
+        if (canvasContext2d) {
+          canvasContext2d.drawImage(imageBitmap, 0, 0);
+
+          const centeredXCoordinate = canvas.width / 2;
+          const centeredYCoordinate = canvas.height / 2;
+
+          const [r, g, b] = canvasContext2d.getImageData(
+            centeredXCoordinate,
+            centeredYCoordinate,
+            1,
+            1
+          ).data;
+
+          capturedColor.value = { r, g, b };
+        }
       }
-    });
+    } catch (error) {
+      console.error("setRGBColorFromCanvas() error: ", error);
+    }
   }
+
+  return { capturedColorHex };
 }
 </script>

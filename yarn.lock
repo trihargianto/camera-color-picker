@@ -403,6 +403,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/w3c-image-capture@npm:^1.0.10":
+  version: 1.0.10
+  resolution: "@types/w3c-image-capture@npm:1.0.10"
+  dependencies:
+    "@types/webrtc": "npm:*"
+  checksum: 2de45e7ac3ec893fc64884873961715fdd3b93dd8c3d90c744997e0bc12a4618525c54c4c06ddc6c4ca280bfa8205211cdbe5f37150b45cca1c3b54c67b45cea
+  languageName: node
+  linkType: hard
+
+"@types/webrtc@npm:*":
+  version: 0.0.41
+  resolution: "@types/webrtc@npm:0.0.41"
+  checksum: 71e6fdf50b226b24c8d2e5ef42b7d4ddd8fe1f556d31acb8c0f35f8e3f3dc0a05ba411ddc75edb22ea5c3297543a4960a1dad4370d56fd8a0eb7bf16751132ce
+  languageName: node
+  linkType: hard
+
 "@vitejs/plugin-vue@npm:^4.5.0":
   version: 4.5.2
   resolution: "@vitejs/plugin-vue@npm:4.5.2"
@@ -2378,6 +2394,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "what-color@workspace:."
   dependencies:
+    "@types/w3c-image-capture": "npm:^1.0.10"
     "@vitejs/plugin-vue": "npm:^4.5.0"
     autoprefixer: "npm:^10.4.16"
     image-capture: "npm:^0.4.0"
