@@ -1,15 +1,50 @@
+<template>
+  <div class="container mx-auto">
+    <div class="w-full flex justify-center">
+      <canvas ref="canvasRef" class="hidden" />
+
+      <div class="relative">
+        <ColorTooltip :hex-color="capturedColorHex" />
+
+        <video ref="videoRef" autoplay playsinline class="w-full" />
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+
+import { rgbToHex } from "../utils/rgbToHex";
+import ColorTooltip from "./ColorTooltip.vue";
 
 defineOptions({
   name: "CameraControl",
 });
 
-const imageRef = ref<HTMLImageElement | null>(null);
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 const capturedImage = ref<any>();
+const capturedColor = ref<{ r: number; g: number; b: number }>({
+  r: 0,
+  g: 0,
+  b: 0,
+});
+
+const capturedColorHex = computed(() => {
+  const { r, g, b } = capturedColor.value;
+
+  return rgbToHex(r, g, b);
+});
+
+onMounted(() => {
+  openCamera();
+
+  setInterval(() => {
+    captureCamera();
+  }, 500);
+});
 
 function openCamera() {
   navigator.mediaDevices
@@ -25,76 +60,40 @@ function openCamera() {
       }
     })
     .catch((error) => {
-      window.alert(error);
       console.error("getUserMedia() error: ", error);
     });
 }
 
 function captureCamera() {
-  capturedImage.value
-    .takePhoto()
-    .then((blob: Blob) => {
-      if (imageRef.value) {
-        imageRef.value.src = URL.createObjectURL(blob);
-        // @ts-ignore-next
-        imageRef.value.onload = () => URL.revokeObjectURL(imageRef.value.src);
-      }
-    })
-    .catch((error: any) => {
-      window.alert(error);
-      console.error("takePhoto() error: ", error);
-    });
-}
-
-function captureCanvas() {
   const canvas = canvasRef.value;
 
-  capturedImage.value.grabFrame().then((imageBitmap: ImageBitmap) => {
-    if (canvas) {
+  if (canvas && capturedImage.value) {
+    capturedImage.value.grabFrame().then((imageBitmap: ImageBitmap) => {
       canvas.width = imageBitmap.width;
       canvas.height = imageBitmap.height;
-      canvas.getContext("2d")?.drawImage(imageBitmap, 0, 0);
-    }
-  });
+
+      const ctx = canvas.getContext("2d");
+
+      if (ctx) {
+        ctx.drawImage(imageBitmap, 0, 0);
+
+        const centeredXCoordinate = canvas.width / 2;
+        const centeredYCoordinate = canvas.height / 2;
+
+        const imageData = ctx.getImageData(
+          centeredXCoordinate,
+          centeredYCoordinate,
+          1,
+          1
+        ).data;
+
+        capturedColor.value = {
+          r: imageData[0],
+          g: imageData[1],
+          b: imageData[2],
+        };
+      }
+    });
+  }
 }
 </script>
-
-<template>
-  <div class="container mx-auto pt-10">
-    <div class="w-full flex justify-center flex-col items-start lg:">
-      <div class="flex mb-6 items-start flex-col sm:flex-row">
-        <!-- <img
-          ref="imageRef"
-          class="w-96 pr-10"
-          src="https://placeholder.pics/svg/300x300"
-        /> -->
-        <div>
-          <p>Canvas</p>
-          <canvas ref="canvasRef" />
-        </div>
-        <div>
-          <p>Camera</p>
-          <video ref="videoRef" autoplay playsinline class="w-full" />
-        </div>
-      </div>
-      <button
-        @click="openCamera"
-        class="border bg-blue-500 py-3 px-4 text-white rounded-md hover:bg-blue-400"
-      >
-        Open Camera
-      </button>
-      <button
-        @click="captureCamera"
-        class="border bg-blue-500 py-3 px-4 text-white rounded-md hover:bg-blue-400"
-      >
-        Capture Camera
-      </button>
-      <button
-        @click="captureCanvas"
-        class="border bg-blue-500 py-3 px-4 text-white rounded-md hover:bg-blue-400"
-      >
-        Capture Canvas
-      </button>
-    </div>
-  </div>
-</template>
