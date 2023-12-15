@@ -4,7 +4,9 @@
       <canvas ref="canvasRef" class="hidden" />
 
       <div class="relative">
-        <ColorTooltip :hex-color="capturedColorHex" />
+        <ColorTooltip :hex-color="capturedColorHex">
+          {{ capturedColorName }}
+        </ColorTooltip>
 
         <video ref="videoRef" autoplay playsinline class="w-full" />
       </div>
@@ -15,7 +17,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
-import { rgbToHex } from "../utils/rgbToHex";
+import { hexToColorName } from "../utils/hex-to-color-name";
+import { rgbToHex } from "../utils/rgb-to-hex.ts";
 import ColorTooltip from "./ColorTooltip.vue";
 
 defineOptions({
@@ -26,7 +29,7 @@ const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
 const { capturedImage } = useCamera();
-const { capturedColorHex } = useColorCapture(capturedImage);
+const { capturedColorName, capturedColorHex } = useColorCapture(capturedImage);
 
 function useCamera() {
   const capturedImage = ref<ImageCapture | null>(null);
@@ -80,6 +83,10 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
     return rgbToHex(r, g, b);
   });
 
+  const capturedColorName = computed(() => {
+    return hexToColorName(capturedColorHex.value);
+  });
+
   const intervalId = ref<number | null>(null);
 
   onMounted(() => {
@@ -127,6 +134,6 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
     }
   }
 
-  return { capturedColorHex };
+  return { capturedColorName, capturedColorHex };
 }
 </script>
