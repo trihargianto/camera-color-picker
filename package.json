@@ -1,9 +1,10 @@
 {
-  "name": "what-color",
+  "name": "camera-color-picker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "commit": "yarn changeset && yarn better-commits",
     "dev": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
@@ -14,9 +15,11 @@
     "vue": "^3.3.8"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@types/w3c-image-capture": "^1.0.10",
     "@vitejs/plugin-vue": "^4.5.0",
     "autoprefixer": "^10.4.16",
+    "better-commits": "^1.7.2",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.2.2",
