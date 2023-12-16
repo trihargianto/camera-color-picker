@@ -8,7 +8,7 @@
       <div
         class="w-full relative aspect-square rounded-2xl sm:rounded-xl border flex justify-center items-center"
       >
-        <ColorTooltip :hex-color="capturedColorHex">
+        <ColorTooltip v-if="isCameraShown" :hex-color="capturedColorHex">
           {{ capturedColorName }}
         </ColorTooltip>
 
