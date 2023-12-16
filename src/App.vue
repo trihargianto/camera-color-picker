@@ -9,7 +9,7 @@ import CameraControl from "./components/CameraControl.vue";
       class="text-2xl sm:text-3xl font-semibold flex justify-center items-center"
     >
       <img :src="LogoPng" class="w-10 h-10 mr-2" />
-      What Color?
+      Camera Color Picker
     </p>
 
     <CameraControl class="my-6 sm:my-6" />

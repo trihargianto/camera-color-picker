@@ -1,4 +1,4 @@
-# <img src="src/assets/what-color-logo.png" width="30" /> What Color
+# <img src="src/assets/what-color-logo.png" width="30" /> Camera Color Picker
 
 This tool aims to answer "What Color is this?" question.
 
