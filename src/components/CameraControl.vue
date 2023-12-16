@@ -5,16 +5,20 @@
     >
       <canvas ref="canvasRef" class="hidden" />
 
-      <div class="relative">
+      <div
+        class="w-full relative aspect-square rounded-2xl sm:rounded-xl border flex justify-center items-center"
+      >
         <ColorTooltip :hex-color="capturedColorHex">
           {{ capturedColorName }}
         </ColorTooltip>
+
+        <p v-if="!isCameraShown" class="absolute z-1">Initializing camera...</p>
 
         <video
           ref="videoRef"
           autoplay
           playsinline
-          class="w-full rounded-2xl sm:rounded-xl"
+          class="rounded-2xl sm:rounded-xl absolute z-2"
         />
       </div>
 
@@ -42,13 +46,15 @@ defineOptions({
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
-const { capturedImage, flipCamera } = useCamera();
+const { capturedImage, isCameraShown, flipCamera } = useCamera();
 const { capturedColorName, capturedColorHex } = useColorCapture(capturedImage);
 
 function useCamera() {
   const isFrontCamera = ref<boolean>(false);
   const capturedImage = ref<ImageCapture | null>(null);
   const mediaStream = ref<MediaStream | undefined>(undefined);
+
+  const isCameraShown = ref<boolean>(false);
 
   onMounted(() => {
     startCamera();
@@ -77,6 +83,8 @@ function useCamera() {
 
       setCapturedImage();
       setVideoSrcObject();
+
+      isCameraShown.value = true;
     } catch (error) {
       console.error("getUserMedia() error: ", error);
     }
@@ -94,6 +102,8 @@ function useCamera() {
     if (videoRef.value) {
       videoRef.value.srcObject = null;
     }
+
+    isCameraShown.value = false;
   }
 
   function setCapturedImage() {
@@ -110,7 +120,7 @@ function useCamera() {
     }
   }
 
-  return { capturedImage, flipCamera };
+  return { capturedImage, isCameraShown, flipCamera };
 }
 
 function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
