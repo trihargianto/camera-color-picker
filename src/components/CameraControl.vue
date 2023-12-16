@@ -116,7 +116,7 @@ function onShutterButtonClick() {
  * COMPOSABLE SPECIFIC TO THIS COMPONENT
  */
 function useCamera() {
-  const isFrontCamera = ref<boolean>(true);
+  const isFrontCamera = ref<boolean>(false);
   const capturedImage = ref<ImageCapture | null>(null);
   const mediaStream = ref<MediaStream | undefined>(undefined);
 
