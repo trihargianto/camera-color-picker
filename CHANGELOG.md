@@ -1,5 +1,12 @@
 # camera-color-picker
 
+## 0.3.0
+
+### Minor Changes
+
+- 9c81e2b: Add prettier to format code and format vue & ts files
+- b96f02a: 🎨 Redesign camera user interface. Shutter camera, flip camera, and captured color by shutter added
+
 ## 0.2.1
 
 ### Patch Changes
