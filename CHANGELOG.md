@@ -1,5 +1,11 @@
 # camera-color-picker
 
+## 0.2.1
+
+### Patch Changes
+
+- ca31511: Fix Color Tooltip shown when initializing camera
+
 ## 0.2.0
 
 ### Minor Changes
