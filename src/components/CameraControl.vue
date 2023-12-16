@@ -1,33 +1,91 @@
 <template>
   <div class="container mx-auto flex justify-center">
     <div
-      class="flex w-full flex-col items-center justify-center px-6 sm:w-[600px]"
+      class="flex w-full flex-col items-center justify-center px-6 text-white sm:w-[500px]"
     >
       <canvas ref="canvasRef" class="hidden" />
 
       <div
-        class="relative flex aspect-square w-full items-center justify-center rounded-2xl border sm:rounded-xl"
+        class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border"
       >
-        <ColorTooltip v-if="isCameraShown" :hex-color="capturedColorHex">
-          {{ capturedColorName }}
-        </ColorTooltip>
-
-        <p v-if="!isCameraShown" class="z-1 absolute">Initializing camera...</p>
-
         <video
           ref="videoRef"
           autoplay
           playsinline
-          class="z-2 absolute rounded-2xl sm:rounded-xl"
+          class="z-2 absolute rounded-2xl"
         />
+
+        <template v-if="isCameraShown">
+          <div class="absolute">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </div>
+
+          <div
+            class="absolute bottom-[0] z-10 flex h-9 w-full items-center justify-center rounded-b-2xl text-center text-white"
+            :style="`background-color: rgba(${capturedColor.r},${capturedColor.g},${capturedColor.b}, 0.7);`"
+          >
+            {{ capturedColorHex }} / {{ capturedColorName }}
+          </div>
+        </template>
+        <p v-else class="absolute">Initializing camera...</p>
       </div>
 
-      <button
-        class="mt-4 inline-flex w-24 items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-32 sm:text-sm"
-        @click="flipCamera()"
-      >
-        Flip Camera
-      </button>
+      <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
+        <div
+          class="h-11 w-11 cursor-pointer rounded-sm border border-white bg-white"
+          :style="`background: ${capturedColorHexByUser}`"
+        />
+
+        <div class="flex items-center justify-center rounded-full bg-white p-1">
+          <div
+            class="h-20 w-20 cursor-pointer rounded-full border-2 border-black bg-white"
+            style="
+              background: rgb(131, 58, 180);
+              background: linear-gradient(
+                90deg,
+                rgba(131, 58, 180, 1) 0%,
+                rgba(253, 29, 29, 1) 50%,
+                rgba(252, 176, 69, 1) 100%
+              );
+            "
+            role="button"
+            @click="onShutterButtonClick()"
+          />
+        </div>
+
+        <button
+          class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(255,255,255,0.5)] text-center text-white"
+          @click="flipCamera()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -37,7 +95,6 @@ import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
 import { hexToColorName } from "../utils/hex-to-color-name";
 import { rgbToHex } from "../utils/rgb-to-hex.ts";
-import ColorTooltip from "./ColorTooltip.vue";
 
 defineOptions({
   name: "CameraControl",
@@ -45,12 +102,21 @@ defineOptions({
 
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
+const capturedColorHexByUser = ref<string | null>(null);
 
 const { capturedImage, isCameraShown, flipCamera } = useCamera();
-const { capturedColorName, capturedColorHex } = useColorCapture(capturedImage);
+const { capturedColor, capturedColorName, capturedColorHex } =
+  useColorCapture(capturedImage);
 
+function onShutterButtonClick() {
+  capturedColorHexByUser.value = capturedColorHex.value;
+}
+
+/**
+ * COMPOSABLE SPECIFIC TO THIS COMPONENT
+ */
 function useCamera() {
-  const isFrontCamera = ref<boolean>(false);
+  const isFrontCamera = ref<boolean>(true);
   const capturedImage = ref<ImageCapture | null>(null);
   const mediaStream = ref<MediaStream | undefined>(undefined);
 
@@ -187,6 +253,6 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
     }
   }
 
-  return { capturedColorName, capturedColorHex };
+  return { capturedColor, capturedColorName, capturedColorHex };
 }
 </script>
