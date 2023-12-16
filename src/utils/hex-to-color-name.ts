@@ -1,9 +1,9 @@
-export function hexToColorName(hex: string) {
-  if (window.ntc) {
-    const [_, colorName] = window.ntc.name(hex);
+import ntc from "@trihargianto/ntcjs";
 
-    return colorName;
-  }
+export function hexToColorName(hex: string) {
+  const [_, colorName] = ntc.name(hex);
+
+  return colorName;
 
   return null;
 }

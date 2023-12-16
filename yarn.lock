@@ -403,6 +403,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@trihargianto/ntcjs@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@trihargianto/ntcjs@npm:1.0.0"
+  checksum: 6d5025944c5bd81e8aa43e20edb56151c2cc6c15fe3de9c8c583a0a15b693cd0b6fcac66f3ed631e2caef8541bf0a96c069848389aaa82ba09f9677aa6fd5503
+  languageName: node
+  linkType: hard
+
 "@types/w3c-image-capture@npm:^1.0.10":
   version: 1.0.10
   resolution: "@types/w3c-image-capture@npm:1.0.10"
@@ -2394,6 +2401,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "what-color@workspace:."
   dependencies:
+    "@trihargianto/ntcjs": "npm:^1.0.0"
     "@types/w3c-image-capture": "npm:^1.0.10"
     "@vitejs/plugin-vue": "npm:^4.5.0"
     autoprefixer: "npm:^10.4.16"
