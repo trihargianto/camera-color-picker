@@ -7,9 +7,9 @@ import CameraControl from "./components/CameraControl.vue";
 <template>
   <div class="py-10">
     <p
-      class="text-2xl sm:text-3xl font-semibold flex justify-center items-center mb-8"
+      class="mb-8 flex items-center justify-center text-2xl font-semibold sm:text-3xl"
     >
-      <img :src="LogoPng" class="w-10 h-10 mr-2" />
+      <img :src="LogoPng" class="mr-2 h-10 w-10" />
       Camera Color Picker
     </p>
 
@@ -23,7 +23,7 @@ import CameraControl from "./components/CameraControl.vue";
         </a>
       </p>
 
-      <div class="flex justify-center mt-3 gap-4">
+      <div class="mt-3 flex justify-center gap-4">
         <p class="inline-flex gap-2">
           <a
             href="https://github.com/trihargianto/camera-color-picker"

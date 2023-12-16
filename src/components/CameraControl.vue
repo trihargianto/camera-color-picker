@@ -1,29 +1,29 @@
 <template>
   <div class="container mx-auto flex justify-center">
     <div
-      class="w-full sm:w-[600px] flex justify-center flex-col px-6 items-center"
+      class="flex w-full flex-col items-center justify-center px-6 sm:w-[600px]"
     >
       <canvas ref="canvasRef" class="hidden" />
 
       <div
-        class="w-full relative aspect-square rounded-2xl sm:rounded-xl border flex justify-center items-center"
+        class="relative flex aspect-square w-full items-center justify-center rounded-2xl border sm:rounded-xl"
       >
         <ColorTooltip v-if="isCameraShown" :hex-color="capturedColorHex">
           {{ capturedColorName }}
         </ColorTooltip>
 
-        <p v-if="!isCameraShown" class="absolute z-1">Initializing camera...</p>
+        <p v-if="!isCameraShown" class="z-1 absolute">Initializing camera...</p>
 
         <video
           ref="videoRef"
           autoplay
           playsinline
-          class="rounded-2xl sm:rounded-xl absolute z-2"
+          class="z-2 absolute rounded-2xl sm:rounded-xl"
         />
       </div>
 
       <button
-        class="mt-4 inline-flex items-center justify-center rounded-md px-3 py-2 text-xs sm:text-sm font-semibold shadow-sm text-white bg-blue-600 hover:bg-blue-500 w-24 sm:w-32"
+        class="mt-4 inline-flex w-24 items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-32 sm:text-sm"
         @click="flipCamera()"
       >
         Flip Camera
@@ -176,7 +176,7 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
             centeredXCoordinate,
             centeredYCoordinate,
             1,
-            1
+            1,
           ).data;
 
           capturedColor.value = { r, g, b };
