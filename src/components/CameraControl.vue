@@ -1,5 +1,11 @@
 <template>
   <div class="container mx-auto flex justify-center">
+    <ModalCapturedColor
+      v-model="isModalCapturedColorVisible"
+      :color-hex="capturedColorHexByUser"
+      :color-name="capturedColorNameByUser"
+    />
+
     <div
       class="flex w-full flex-col items-center justify-center px-6 text-white sm:w-[500px]"
     >
@@ -50,6 +56,7 @@
 
       <CameraActionButtons
         :captured-color-hex-by-user="capturedColorHexByUser"
+        @on-click-captured-color-button="showModalCapturedColor()"
         @on-click-flip-camera-button="flipCamera()"
         @on-click-shutter-button="onShutterButtonClick()"
       />
@@ -61,6 +68,7 @@
 import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
 import CameraActionButtons from "./CameraActionButtons.vue";
+import ModalCapturedColor from "./ModalCapturedColor.vue";
 import * as config from "../constants/config";
 import { hexToColorName } from "../utils/hex-to-color-name";
 import { rgbToHex } from "../utils/rgb-to-hex.ts";
@@ -75,8 +83,15 @@ const canvasRef = ref<HTMLCanvasElement | null>(null);
 const capturedColorHexByUser = ref<string | null>(null);
 
 const { capturedImage, isCameraShown, flipCamera } = useCamera();
+const { isModalCapturedColorVisible, showModalCapturedColor } = useModal();
 const { capturedColor, capturedColorName, capturedColorHex } =
   useColorCapture(capturedImage);
+
+const capturedColorNameByUser = computed(() => {
+  return capturedColorHexByUser.value
+    ? hexToColorName(capturedColorHexByUser.value)
+    : null;
+});
 
 function onShutterButtonClick() {
   playCameraShutterSound();
@@ -228,5 +243,18 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
   }
 
   return { capturedColor, capturedColorName, capturedColorHex };
+}
+
+function useModal() {
+  const isModalCapturedColorVisible = ref<boolean>(false);
+
+  function showModalCapturedColor() {
+    isModalCapturedColorVisible.value = true;
+  }
+
+  return {
+    isModalCapturedColorVisible,
+    showModalCapturedColor,
+  };
 }
 </script>

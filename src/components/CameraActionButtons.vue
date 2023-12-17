@@ -1,8 +1,12 @@
 <template>
   <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
+    <div v-if="!props.capturedColorHexByUser" class="w-11" />
     <div
-      class="h-11 w-11 cursor-pointer rounded-sm border border-white bg-white"
+      v-else
+      class="h-11 w-11 rounded-sm border border-white"
       :style="`background: ${props.capturedColorHexByUser}`"
+      role="button"
+      @click="$emit('on-click-captured-color-button')"
     />
 
     <div class="flex items-center justify-center rounded-full bg-white p-1">
@@ -61,6 +65,11 @@ const emit = defineEmits([
    * Emitted when the flip camera button is clicked.
    */
   "on-click-flip-camera-button",
+
+  /**
+   * Emitted when the captured color button is clicked.
+   */
+  "on-click-captured-color-button",
 ]);
 
 const props = defineProps({
