@@ -40,7 +40,12 @@
             {{ capturedColorHex }} / {{ capturedColorName }}
           </div>
         </template>
-        <p v-else class="absolute">Initializing camera...</p>
+        <p v-else class="absolute">
+          <template v-if="config.IS_CAMERA_ENABLED">
+            Initializing camera...
+          </template>
+          <template v-else>Camera is disabled</template>
+        </p>
       </div>
 
       <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
@@ -93,6 +98,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
+import * as config from "../constants/config";
 import { hexToColorName } from "../utils/hex-to-color-name";
 import { rgbToHex } from "../utils/rgb-to-hex.ts";
 
@@ -123,7 +129,9 @@ function useCamera() {
   const isCameraShown = ref<boolean>(false);
 
   onMounted(() => {
-    startCamera();
+    if (config.IS_CAMERA_ENABLED) {
+      startCamera();
+    }
   });
 
   function flipCamera() {
