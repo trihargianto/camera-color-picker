@@ -1,5 +1,11 @@
 # camera-color-picker
 
+## 0.5.1
+
+### Patch Changes
+
+- ef79dc3: Fix components not found
+
 ## 0.5.0
 
 ### Minor Changes
