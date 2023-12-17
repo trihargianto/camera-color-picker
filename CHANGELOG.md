@@ -1,5 +1,14 @@
 # camera-color-picker
 
+## 0.4.0
+
+### Minor Changes
+
+- 1d7c31f: Add Modal to show the latest captured color by user
+- ac2e703: Add camera shutter sound
+- 19c8f05: Extract some templates into it's own separated components so the main components can be smaller
+- b20f376: Add `IS_CAMERA_ENABLED` flag to enable the camera feature or not
+
 ## 0.3.0
 
 ### Minor Changes
