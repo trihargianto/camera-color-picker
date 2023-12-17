@@ -64,6 +64,7 @@ import CameraActionButtons from "./CameraActionButtons.vue";
 import * as config from "../constants/config";
 import { hexToColorName } from "../utils/hex-to-color-name";
 import { rgbToHex } from "../utils/rgb-to-hex.ts";
+import { playCameraShutterSound } from "../utils/sound-player";
 
 defineOptions({
   name: "CameraControl",
@@ -78,6 +79,8 @@ const { capturedColor, capturedColorName, capturedColorHex } =
   useColorCapture(capturedImage);
 
 function onShutterButtonClick() {
+  playCameraShutterSound();
+
   capturedColorHexByUser.value = capturedColorHex.value;
 }
 
