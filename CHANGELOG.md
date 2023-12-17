@@ -1,5 +1,12 @@
 # camera-color-picker
 
+## 0.5.0
+
+### Minor Changes
+
+- bffb496: Add storybook stories to all components
+- a6447b2: Install Storybook
+
 ## 0.4.0
 
 ### Minor Changes
