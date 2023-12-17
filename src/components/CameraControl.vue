@@ -48,49 +48,11 @@
         </p>
       </div>
 
-      <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
-        <div
-          class="h-11 w-11 cursor-pointer rounded-sm border border-white bg-white"
-          :style="`background: ${capturedColorHexByUser}`"
-        />
-
-        <div class="flex items-center justify-center rounded-full bg-white p-1">
-          <div
-            class="h-20 w-20 cursor-pointer rounded-full border-2 border-black bg-white"
-            style="
-              background: rgb(131, 58, 180);
-              background: linear-gradient(
-                90deg,
-                rgba(131, 58, 180, 1) 0%,
-                rgba(253, 29, 29, 1) 50%,
-                rgba(252, 176, 69, 1) 100%
-              );
-            "
-            role="button"
-            @click="onShutterButtonClick()"
-          />
-        </div>
-
-        <button
-          class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(255,255,255,0.5)] text-center text-white"
-          @click="flipCamera()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-        </button>
-      </div>
+      <CameraActionButtons
+        :captured-color-hex-by-user="capturedColorHexByUser"
+        @on-click-flip-camera-button="flipCamera()"
+        @on-click-shutter-button="onShutterButtonClick()"
+      />
     </div>
   </div>
 </template>
@@ -98,6 +60,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
+import CameraActionButtons from "./CameraActionButtons.vue";
 import * as config from "../constants/config";
 import { hexToColorName } from "../utils/hex-to-color-name";
 import { rgbToHex } from "../utils/rgb-to-hex.ts";
