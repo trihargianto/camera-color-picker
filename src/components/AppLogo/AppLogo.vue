@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import LogoPng from "../assets/what-color-logo.png";
+import LogoPng from "../../assets/what-color-logo.png";
 </script>

@@ -67,12 +67,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, Ref } from "vue";
 
-import CameraActionButtons from "./CameraActionButtons.vue";
-import ModalCapturedColor from "./ModalCapturedColor.vue";
-import * as config from "../constants/config";
-import { hexToColorName } from "../utils/hex-to-color-name";
-import { rgbToHex } from "../utils/rgb-to-hex.ts";
-import { playCameraShutterSound } from "../utils/sound-player";
+import CameraActionButtons from "../CameraActionButtons";
+import ModalCapturedColor from "../ModalCapturedColor";
+import * as config from "../../constants/config";
+import { hexToColorName } from "../../utils/hex-to-color-name";
+import { rgbToHex } from "../../utils/rgb-to-hex.ts";
+import { playCameraShutterSound } from "../../utils/sound-player";
 
 defineOptions({
   name: "CameraControl",
@@ -198,6 +198,7 @@ function useColorCapture(capturedImage: Ref<ImageCapture | null>) {
   const intervalId = ref<number | null>(null);
 
   onMounted(() => {
+    // @ts-ignore-next
     intervalId.value = setInterval(() => {
       setRGBColorFromCanvas();
     }, 500);
