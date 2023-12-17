@@ -1,3 +1,3 @@
-import AppLogo from "../AppLogo.vue";
+import AppLogo from "./AppLogo.vue";
 
 export default AppLogo;

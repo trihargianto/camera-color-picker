@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import AppLogo from "./components/AppLogo.vue";
-import CameraControl from "./components/CameraControl.vue";
+import AppLogo from "./components/AppLogo";
+import CameraControl from "./components/CameraControl";
 </script>
 
 <template>
