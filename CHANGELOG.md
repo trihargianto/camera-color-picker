@@ -1,5 +1,13 @@
 # camera-color-picker
 
+## 0.6.0
+
+### Minor Changes
+
+- 9c1c2e2: Refactor camera logic structure from CameraControl.vue to App.vue
+- 8496e58: Add Storybook actions to CameraActionButtons
+- 2fd2833: Show Captured Color Modal after shutter button clicked
+
 ## 0.5.1
 
 ### Patch Changes
