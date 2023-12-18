@@ -5,7 +5,7 @@
     :style="`background-color: ${props.colorHex}`"
   >
     <div
-      class="flex w-96 flex-col items-center justify-center rounded-xl bg-white px-7 pb-2 pt-10"
+      class="flex w-80 flex-col items-center justify-center rounded-xl bg-white px-7 pb-2 pt-10"
     >
       <div
         class="mb-6 h-20 w-20 rounded-full"
