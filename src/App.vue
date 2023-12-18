@@ -42,12 +42,12 @@ const {
   capturedColorNameByUser,
   setCapturedColorHex,
   captureColorByUser,
-} = useColorCapturerByUser();
+} = useColorCapturerByUser(showModalCapturedColor);
 
 /**
  * COMPOSABLE SPECIFIC TO THIS COMPONENT
  */
-function useColorCapturerByUser() {
+function useColorCapturerByUser(showModalCapturedColor: Function) {
   const capturedColorHex = ref<string | null>(null);
   const capturedColorHexByUser = ref<string | null>(null);
 
@@ -61,6 +61,8 @@ function useColorCapturerByUser() {
     playCameraShutterSound();
 
     capturedColorHexByUser.value = capturedColorHex.value;
+
+    showModalCapturedColor();
   }
 
   function setCapturedColorHex(colorHex: string) {
