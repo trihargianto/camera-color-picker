@@ -1,5 +1,11 @@
 # camera-color-picker
 
+## 0.7.0
+
+### Minor Changes
+
+- 20377af: Upgrade ntcjs library & use color group name to show color name
+
 ## 0.6.0
 
 ### Minor Changes
