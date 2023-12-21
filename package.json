@@ -11,7 +11,7 @@
     "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
-    "@trihargianto/ntcjs": "^1.0.0",
+    "@trihargianto/ntcjs": "^1.1.4",
     "image-capture": "^0.4.0",
     "vue": "^3.3.8"
   },

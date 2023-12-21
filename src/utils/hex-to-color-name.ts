@@ -1,9 +1,7 @@
 import ntc from "@trihargianto/ntcjs";
 
 export function hexToColorName(hex: string) {
-  const [_, colorName] = ntc.name(hex);
+  const [_, __, ___, colorGroupName] = ntc.name(hex);
 
-  return colorName;
-
-  return null;
+  return colorGroupName;
 }

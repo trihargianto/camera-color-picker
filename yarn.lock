@@ -3820,10 +3820,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trihargianto/ntcjs@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@trihargianto/ntcjs@npm:1.0.0"
-  checksum: 6d5025944c5bd81e8aa43e20edb56151c2cc6c15fe3de9c8c583a0a15b693cd0b6fcac66f3ed631e2caef8541bf0a96c069848389aaa82ba09f9677aa6fd5503
+"@trihargianto/ntcjs@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@trihargianto/ntcjs@npm:1.1.4"
+  checksum: 1a9ee1d6a98cf9f2ceca6b603f9bec6cc2df41701326c2db9e462a29b7acaf62d982c9521e921964f9d9c4278e82de29204efce508381b5c5ad775bcec1259db
   languageName: node
   linkType: hard
 
@@ -5227,7 +5227,7 @@ __metadata:
     "@storybook/test": "npm:^7.6.5"
     "@storybook/vue3": "npm:^7.6.5"
     "@storybook/vue3-vite": "npm:^7.6.5"
-    "@trihargianto/ntcjs": "npm:^1.0.0"
+    "@trihargianto/ntcjs": "npm:^1.1.4"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     "@types/w3c-image-capture": "npm:^1.0.10"
