@@ -238,4 +238,3 @@ function useCanvasColorCapture(capturedImage: Ref<ImageCapture | null>) {
   return { capturedColor, capturedColorName, capturedColorHex };
 }
 </script>
-../../constants/config.ts../../utils/hex-to-color-name.ts
