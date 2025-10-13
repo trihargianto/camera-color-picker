@@ -2,14 +2,14 @@
   <div
     v-if="isModalVisible"
     class="fixed bottom-[0] left-[0] right-[0] top-[0] z-20 flex h-full w-full items-center justify-center bg-white text-black"
-    :style="`background-color: ${props.colorHex}`"
+    :style="`background-color: ${colorHexWithHash}`"
   >
     <div
       class="flex w-80 flex-col items-center justify-center rounded-xl bg-white px-7 pb-2 pt-10"
     >
       <div
         class="mb-6 h-20 w-20 rounded-full"
-        :style="`background-color: ${props.colorHex}`"
+        :style="`background-color: ${colorHexWithHash}`"
       />
 
       <p class="mb-1 text-xl font-semibold">
@@ -17,8 +17,29 @@
       </p>
 
       <p class="text-lg text-gray-400">
-        {{ props.colorHex }}
+        {{ colorHexWithHash }}
       </p>
+
+      <div
+        v-if="props.errorMessage"
+        class="mt-4 flex items-start rounded-md bg-red-50 px-4 py-3 text-sm text-red-800"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="mr-2 mt-0.5 h-5 w-5 flex-shrink-0"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+          />
+        </svg>
+        <span>{{ props.errorMessage }}</span>
+      </div>
 
       <div class="mb-6" />
 
@@ -86,6 +107,14 @@ const props = defineProps({
     type: [String, null] as PropType<string | null>,
     default: null,
   },
+
+  /**
+   * Error message to display
+   */
+  errorMessage: {
+    type: [String, null] as PropType<string | null>,
+    default: null,
+  },
 });
 
 const emit = defineEmits([
@@ -99,6 +128,10 @@ const isModalVisible = computed(() => {
   return props.modelValue;
 });
 
+const colorHexWithHash = computed(() => {
+  return `#${props.colorHex}`;
+});
+
 function closeModal() {
   emit("update:modelValue", false);
 }
@@ -106,7 +139,7 @@ function closeModal() {
 async function copyHexColorToClipboard() {
   try {
     if (props.colorHex) {
-      await navigator.clipboard.writeText(props.colorHex);
+      await navigator.clipboard.writeText(colorHexWithHash);
 
       window.alert("Content copied to clipboard 🙌");
     }
