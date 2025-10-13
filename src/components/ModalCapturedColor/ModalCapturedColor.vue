@@ -139,7 +139,7 @@ function closeModal() {
 async function copyHexColorToClipboard() {
   try {
     if (props.colorHex) {
-      await navigator.clipboard.writeText(colorHexWithHash);
+      await navigator.clipboard.writeText(colorHexWithHash.value);
 
       window.alert("Content copied to clipboard 🙌");
     }

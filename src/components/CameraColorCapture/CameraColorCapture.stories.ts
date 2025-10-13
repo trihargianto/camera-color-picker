@@ -1,4 +1,4 @@
-import { action } from "@storybook/addon-actions";
+import { fn } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
 import CameraColorCapture from "./CameraColorCapture.vue";
@@ -15,7 +15,7 @@ export const Default: Story = {
   render: (args) => ({
     components: { CameraColorCapture },
     setup() {
-      const onColorCaptured = action("on-color-captured");
+      const onColorCaptured = fn();
 
       return { args, onColorCaptured };
     },

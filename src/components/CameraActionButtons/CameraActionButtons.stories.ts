@@ -1,4 +1,4 @@
-import { action } from "@storybook/addon-actions";
+import { fn } from "@storybook/test";
 import type { Meta, StoryObj } from "@storybook/vue3";
 
 import CameraActionButtons from "./CameraActionButtons.vue";
@@ -15,11 +15,9 @@ export const Default: Story = {
   render: (args) => ({
     components: { CameraActionButtons },
     setup() {
-      const onClickShutterButton = action("on-click-shutter-button");
-      const onClickFlipCameraButton = action("on-click-flip-camera-button");
-      const onClickCapturedColorButton = action(
-        "on-click-captured-color-button",
-      );
+      const onClickShutterButton = fn();
+      const onClickFlipCameraButton = fn();
+      const onClickCapturedColorButton = fn();
 
       return {
         args,
