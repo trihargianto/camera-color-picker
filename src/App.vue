@@ -20,19 +20,19 @@
       v-model="isModalCapturedColorVisible"
       :color-hex="capturedColorHexByUser"
       :color-name="capturedColorNameByUser"
+      :error-message="capturedColorError"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 import AppLogo from "./components/AppLogo";
 import CameraColorCapture from "./components/CameraColorCapture";
 import CameraActionButtons from "./components/CameraActionButtons";
 import ModalCapturedColor from "./components/ModalCapturedColor";
-import { playCameraShutterSound } from "./utils/sound-player";
-import { hexToColorName } from "./utils/hex-to-color-name";
+import { useColorCapturerByUser } from "./composables/useColorCapturerByUser";
 
 const { isModalCapturedColorVisible, showModalCapturedColor } = useModal();
 const { isFrontCamera, flipCamera } = useCameraHandler();
@@ -40,43 +40,10 @@ const { isFrontCamera, flipCamera } = useCameraHandler();
 const {
   capturedColorHexByUser,
   capturedColorNameByUser,
+  capturedColorError,
   setCapturedColorHex,
   captureColorByUser,
 } = useColorCapturerByUser(showModalCapturedColor);
-
-/**
- * COMPOSABLE SPECIFIC TO THIS COMPONENT
- */
-function useColorCapturerByUser(showModalCapturedColor: Function) {
-  const capturedColorHex = ref<string | null>(null);
-  const capturedColorHexByUser = ref<string | null>(null);
-
-  const capturedColorNameByUser = computed(() => {
-    return capturedColorHexByUser.value
-      ? hexToColorName(capturedColorHexByUser.value)
-      : null;
-  });
-
-  function captureColorByUser() {
-    playCameraShutterSound();
-
-    capturedColorHexByUser.value = capturedColorHex.value;
-
-    showModalCapturedColor();
-  }
-
-  function setCapturedColorHex(colorHex: string) {
-    capturedColorHex.value = colorHex;
-  }
-
-  return {
-    capturedColorHex,
-    capturedColorHexByUser,
-    capturedColorNameByUser,
-    captureColorByUser,
-    setCapturedColorHex,
-  };
-}
 
 function useCameraHandler() {
   const isFrontCamera = ref<boolean>(false);
