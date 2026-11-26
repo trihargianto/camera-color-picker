@@ -41,4 +41,11 @@ describe("createStableValue", () => {
     expect(next(null)).toBeNull();
     expect(next("Blue")).toBe("Blue");
   });
+
+  it("takes a forced value immediately", () => {
+    const next = createStableValue<string>(2);
+
+    next("Red");
+    expect(next("Orange", true)).toBe("Orange");
+  });
 });

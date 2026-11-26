@@ -23,5 +23,12 @@ export const Default: Story = {
   ],
   args: {
     hexColor: "#FF0000",
+    placement: "top",
+    arrowOffset: 0,
+  },
+  argTypes: {
+    hexColor: { control: "color" },
+    placement: { control: "inline-radio", options: ["top", "bottom"] },
+    arrowOffset: { control: { type: "range", min: -50, max: 50 } },
   },
 };
