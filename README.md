@@ -16,9 +16,9 @@ But why on earth this tool was built in the first place? This is because I need 
 
 - The app averages a small square under the picker point, which starts at the center of the camera view.
 - Tap anywhere in the view to move the point there, or drag anywhere to move it without covering it with your finger. Arrow keys move it too.
-- Tap **Freeze** to hold the current frame, then tap or drag to read any spot without keeping the phone still. Tap **Go live** to go back.
+- Tap **Freeze** to hold the current frame, then tap or drag to read any spot without keeping the phone still. A white ring and a "Frozen" badge show it is not live. Tap **Freeze** again to go back. **Center** returns the point to the middle.
 - The color is named offline: [culori](https://culori.js.org) picks the closest entry in `src/constants/color-names.ts` using CIEDE2000, a formula for how different two colors look to the human eye. Edit that list to change the names.
-- Lighting tints everything (warm bulbs make white look yellow). Point the camera at something white or gray, like paper, and tap **Calibrate white** to cancel the tint. Tap **Reset white** when the lighting changes.
+- Lighting tints everything (warm bulbs make white look yellow). Point the camera at something white or gray, like paper, and tap **Calibrate** to cancel the tint. Tap it again to turn it off when the lighting changes.
 
 ## Local Installation
 
