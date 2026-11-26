@@ -1,14 +1,46 @@
-import { ref, onMounted, onUnmounted, Ref } from "vue";
+import { ref, onMounted, onUnmounted, watch, type Ref } from "vue";
 import * as config from "../constants/config";
 
+export type CameraStatus = "idle" | "starting" | "ready" | "error" | "disabled";
+
+function getCameraErrorMessage(error: unknown) {
+  if (!window.isSecureContext) {
+    return "Camera needs a secure (HTTPS) connection.";
+  }
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    return "This browser does not support camera access.";
+  }
+
+  if (error instanceof DOMException) {
+    switch (error.name) {
+      case "NotAllowedError":
+        return "Camera access was denied. Allow it in your browser settings and reload the page.";
+      case "NotFoundError":
+      case "OverconstrainedError":
+        return "No camera was found on this device.";
+      case "NotReadableError":
+        return "The camera is being used by another app.";
+    }
+  }
+
+  return "Could not start the camera.";
+}
+
 export function useCamera(
-  isFrontCamera: boolean,
+  isFrontCamera: () => boolean,
   videoRef: Ref<HTMLVideoElement | null>,
 ) {
-  const capturedImage = ref<ImageCapture | null>(null);
-  const mediaStream = ref<MediaStream | undefined>(undefined);
+  const status = ref<CameraStatus>(
+    config.IS_CAMERA_ENABLED ? "idle" : "disabled",
+  );
+  const errorMessage = ref<string | null>(null);
 
-  const isCameraShown = ref<boolean>(false);
+  let mediaStream: MediaStream | null = null;
+
+  // Incremented on every start/stop so a slow `getUserMedia` call that resolves
+  // after a newer start (or after unmount) can be detected and discarded.
+  let requestId = 0;
 
   onMounted(() => {
     if (config.IS_CAMERA_ENABLED) {
@@ -16,67 +48,69 @@ export function useCamera(
     }
   });
 
-  onUnmounted(() => {
+  onUnmounted(stopCamera);
+
+  watch(isFrontCamera, () => {
     if (config.IS_CAMERA_ENABLED) {
-      stopCamera();
+      startCamera();
     }
   });
 
-  function restartCamera() {
-    if (config.IS_CAMERA_ENABLED) {
-      stopCamera();
-      startCamera();
-    }
-  }
-
   async function startCamera() {
+    stopCamera();
+
+    const currentRequestId = ++requestId;
+
+    status.value = "starting";
+    errorMessage.value = null;
+
     try {
-      mediaStream.value = await navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: isFrontCamera ? "user" : "environment",
-          width: 1280,
-          height: 1280,
+          facingMode: isFrontCamera() ? "user" : "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 1280 },
         },
       });
 
-      setCapturedImage();
-      setVideoSrcObject();
+      if (currentRequestId !== requestId) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
 
-      isCameraShown.value = true;
+      mediaStream = stream;
+
+      if (videoRef.value) {
+        videoRef.value.srcObject = stream;
+      }
+
+      status.value = "ready";
     } catch (error) {
+      if (currentRequestId !== requestId) {
+        return;
+      }
+
       console.error("getUserMedia() error: ", error);
+
+      status.value = "error";
+      errorMessage.value = getCameraErrorMessage(error);
     }
   }
 
   function stopCamera() {
-    if (mediaStream.value) {
-      mediaStream.value.getTracks().forEach((track) => track.stop());
-    }
+    requestId++;
 
-    if (capturedImage.value) {
-      capturedImage.value = null;
-    }
+    mediaStream?.getTracks().forEach((track) => track.stop());
+    mediaStream = null;
 
     if (videoRef.value) {
       videoRef.value.srcObject = null;
     }
 
-    isCameraShown.value = false;
-  }
-
-  function setCapturedImage() {
-    if (mediaStream.value) {
-      const mediaStreamTrack = mediaStream.value.getVideoTracks()[0];
-
-      capturedImage.value = new ImageCapture(mediaStreamTrack);
+    if (status.value !== "disabled") {
+      status.value = "idle";
     }
   }
 
-  function setVideoSrcObject() {
-    if (mediaStream.value && videoRef.value) {
-      videoRef.value.srcObject = mediaStream.value;
-    }
-  }
-
-  return { capturedImage, isCameraShown, restartCamera };
+  return { status, errorMessage, startCamera };
 }

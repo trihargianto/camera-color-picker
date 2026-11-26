@@ -6,30 +6,41 @@ This tool aims to answer "What Color is this?" question.
 
 But why on earth this tool was built in the first place? This is because I need a tool to help a [color-blind](https://en.wikipedia.org/wiki/Color_blindness) person like me to recognize color in this world easily by using Camera.
 
-## Live 
+## Live
 
-📸 Demo: [https://apparel-customizer.vercel.app](https://camera-color-picker.vercel.app/)
+📸 Demo: [camera-color-picker.vercel.app](https://camera-color-picker.vercel.app/)
 
-📓 Storybook: [https://apparel-customizer-storybook.vercel.app](https://camera-color-picker-storybook.vercel.app/)
+📓 Storybook: [camera-color-picker-storybook.vercel.app](https://camera-color-picker-storybook.vercel.app/)
+
+## How it works
+
+- The app averages a small square at the center of the camera view.
+- The color is named offline: [culori](https://culori.js.org) picks the closest entry in `src/constants/color-names.ts` using CIEDE2000, a formula for how different two colors look to the human eye. Edit that list to change the names.
+- Lighting tints everything (warm bulbs make white look yellow). Point the camera at something white or gray, like paper, and tap **Calibrate white** to cancel the tint. Tap **Reset white** when the lighting changes.
 
 ## Local Installation
 
-Run these commands to start the app on your local machine:
-
-### Install dependencies
+Requires Node.js 22 (see `.nvmrc`) and [pnpm](https://pnpm.io) (enable it with `corepack enable`).
 
 ```
-yarn install
+pnpm install
+pnpm dev
 ```
 
-### Run the development server
+The camera only works on `localhost` or over HTTPS. Set `VITE_CAMERA_ENABLED=false` in a `.env.local` file to run the app without asking for camera access.
 
-```
-yarn dev
-```
+## Scripts
+
+| Command          | What it does                        |
+| ---------------- | ----------------------------------- |
+| `pnpm dev`       | Start the development server        |
+| `pnpm build`     | Type-check and build for production |
+| `pnpm test`      | Run unit tests                      |
+| `pnpm lint`      | Lint with ESLint                    |
+| `pnpm format`    | Format with Prettier                |
+| `pnpm storybook` | Start Storybook on port 6006        |
 
 ## References
 
-- [Take photos and control camera settings](https://developer.chrome.com/blog/imagecapture)
 - [Extracting a color palette from an image with javascript](https://dev.to/producthackers/creating-a-color-palette-with-javascript-44ip)
 - [CanvasRenderingContext2D: getImageData() method](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData)

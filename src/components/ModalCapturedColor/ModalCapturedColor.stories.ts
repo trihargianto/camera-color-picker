@@ -4,6 +4,11 @@ import ModalCapturedColor from "./ModalCapturedColor.vue";
 
 const meta: Meta<typeof ModalCapturedColor> = {
   component: ModalCapturedColor,
+  parameters: {
+    // The modal opens with `showModal()`, so render each story in its own
+    // iframe. Otherwise several modals stack and block the docs page.
+    docs: { story: { inline: false, iframeHeight: 500 } },
+  },
 };
 
 export default meta;

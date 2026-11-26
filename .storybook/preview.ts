@@ -3,6 +3,7 @@ import type { Preview } from "@storybook/vue3";
 import "../src/style.css";
 
 const preview: Preview = {
+  tags: ["autodocs"],
   parameters: {
     backgrounds: {
       default: "dark",
@@ -13,7 +14,6 @@ const preview: Preview = {
         },
       ],
     },
-    actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
       matchers: {
         color: /(background|color)$/i,
