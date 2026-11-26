@@ -17,6 +17,7 @@
     "build:storybook": "storybook build"
   },
   "dependencies": {
+    "@vueuse/core": "^15.1.0",
     "culori": "^4.0.2",
     "vue": "^3.5.46"
   },

@@ -69,7 +69,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch, onMounted } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
+import { useClipboard } from "@vueuse/core";
 import { normalizeHex } from "../../utils/rgb-to-hex";
 
 defineOptions({
@@ -94,30 +95,20 @@ const props = withDefaults(
 
 const dialogRef = ref<HTMLDialogElement | null>(null);
 
-type CopyState = "idle" | "copied" | "failed";
-
-const copyState = ref<CopyState>("idle");
-let copyStateTimeoutId: number | undefined;
-
 const colorHexWithHash = computed(() =>
   props.colorHex ? `#${normalizeHex(props.colorHex)}` : "",
 );
 
-const copyButtonLabel = computed(() => {
-  switch (copyState.value) {
-    case "copied":
-      return "Copied!";
-    case "failed":
-      return "Failed to copy";
-    default:
-      return "Copy hex code";
-  }
-});
+// `legacy` falls back to the old copy command where the Clipboard API is
+// missing or blocked, so copying works on older phones too
+const { copy, copied } = useClipboard({ copiedDuring: 2000, legacy: true });
+
+const copyButtonLabel = computed(() =>
+  copied.value ? "Copied!" : "Copy hex code",
+);
 
 onMounted(syncDialog);
 watch(isModalVisible, syncDialog);
-
-onUnmounted(() => window.clearTimeout(copyStateTimeoutId));
 
 function syncDialog() {
   const dialog = dialogRef.value;
@@ -131,29 +122,12 @@ function syncDialog() {
   } else if (!isModalVisible.value && dialog.open) {
     dialog.close();
   }
-
-  if (!isModalVisible.value) {
-    copyState.value = "idle";
-  }
 }
 
-async function copyHexColorToClipboard() {
-  if (!props.colorHex) {
-    return;
+function copyHexColorToClipboard() {
+  if (props.colorHex) {
+    copy(colorHexWithHash.value);
   }
-
-  try {
-    await navigator.clipboard.writeText(colorHexWithHash.value);
-    copyState.value = "copied";
-  } catch (err) {
-    copyState.value = "failed";
-    console.error("Error copyHexColorToClipboard()", err);
-  }
-
-  window.clearTimeout(copyStateTimeoutId);
-  copyStateTimeoutId = window.setTimeout(() => {
-    copyState.value = "idle";
-  }, 2000);
 }
 </script>
 

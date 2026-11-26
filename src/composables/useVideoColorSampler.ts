@@ -1,4 +1,5 @@
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onUnmounted } from "vue";
+import { useIntervalFn } from "@vueuse/core";
 
 import * as config from "../constants/config";
 import { averageColor, type Rgb } from "../utils/average-color";
@@ -34,19 +35,11 @@ export function useVideoColorSampler(
 
   const context = canvas.getContext("2d", { willReadFrequently: true });
 
-  let intervalId: number | undefined;
   let frameId: number | undefined;
 
-  onMounted(() => {
-    intervalId = window.setInterval(
-      sampleColor,
-      config.COLOR_SAMPLE_INTERVAL_MS,
-    );
-  });
+  useIntervalFn(sampleColor, config.COLOR_SAMPLE_INTERVAL_MS);
 
   onUnmounted(() => {
-    window.clearInterval(intervalId);
-
     if (frameId !== undefined) {
       cancelAnimationFrame(frameId);
     }

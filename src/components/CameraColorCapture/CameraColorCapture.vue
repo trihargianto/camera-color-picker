@@ -141,7 +141,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
+import { useElementSize, useObjectUrl } from "@vueuse/core";
 
 import * as config from "../../constants/config";
 
@@ -185,33 +186,15 @@ const videoRef = ref<HTMLVideoElement | null>(null);
 const frozenFrame = document.createElement("canvas");
 
 /** Image of the frozen frame, shown over the live video while frozen */
-const frozenFrameUrl = ref<string | null>(null);
+const frozenFrameBlob = shallowRef<Blob | null>(null);
+const frozenFrameUrl = useObjectUrl(frozenFrameBlob);
 
 /** Counts freezes, so an image made for an earlier freeze is dropped */
 let freezeId = 0;
 const viewfinderRef = ref<HTMLElement | null>(null);
 
 /** Viewfinder size in px, kept up to date for placing the tooltip */
-const viewSize = ref({ width: 0, height: 0 });
-let resizeObserver: ResizeObserver | undefined;
-
-onMounted(() => {
-  resizeObserver = new ResizeObserver(([entry]) => {
-    viewSize.value = {
-      width: entry.contentRect.width,
-      height: entry.contentRect.height,
-    };
-  });
-
-  if (viewfinderRef.value) {
-    resizeObserver.observe(viewfinderRef.value);
-  }
-});
-
-onUnmounted(() => {
-  resizeObserver?.disconnect();
-  setFrozenFrameUrl(null);
-});
+const { width: viewWidth, height: viewHeight } = useElementSize(viewfinderRef);
 
 const { status, errorMessage, startCamera } = useCamera(
   () => props.isFrontCamera,
@@ -241,19 +224,12 @@ watch([status, () => props.isFrontCamera], () => {
   isFrozen.value = false;
 });
 
+// Drop the frozen image (its URL is released with it)
 watch(isFrozen, (frozen) => {
   if (!frozen) {
-    setFrozenFrameUrl(null);
+    frozenFrameBlob.value = null;
   }
 });
-
-function setFrozenFrameUrl(url: string | null) {
-  if (frozenFrameUrl.value) {
-    URL.revokeObjectURL(frozenFrameUrl.value);
-  }
-
-  frozenFrameUrl.value = url;
-}
 
 function getSampleSource(): SampleSource | null {
   const area = viewfinderRef.value;
@@ -320,7 +296,7 @@ function toggleFreeze() {
   // Shown as an <img>, which crops like the <video> in every browser
   frozenFrame.toBlob((blob) => {
     if (blob && isFrozen.value && currentFreezeId === freezeId) {
-      setFrozenFrameUrl(URL.createObjectURL(blob));
+      frozenFrameBlob.value = blob;
     }
   });
 }
@@ -333,8 +309,8 @@ const TOOLTIP_ROOM_ABOVE = 132;
 const TOOLTIP_GAP = 20;
 
 const reticlePx = computed(() => ({
-  x: reticle.position.value.x * viewSize.value.width,
-  y: reticle.position.value.y * viewSize.value.height,
+  x: reticle.position.value.x * viewWidth.value,
+  y: reticle.position.value.y * viewHeight.value,
 }));
 
 const reticleStyle = computed(() => ({
@@ -349,7 +325,7 @@ const tooltipPlacement = computed(() =>
 const tooltipX = computed(() =>
   Math.min(
     Math.max(reticlePx.value.x, TOOLTIP_HALF_WIDTH),
-    Math.max(viewSize.value.width - TOOLTIP_HALF_WIDTH, TOOLTIP_HALF_WIDTH),
+    Math.max(viewWidth.value - TOOLTIP_HALF_WIDTH, TOOLTIP_HALF_WIDTH),
   ),
 );
 
