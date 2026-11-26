@@ -1,9 +1,10 @@
 <template>
+  <!-- Size container: the square viewfinder takes the largest size that fits -->
   <div
-    class="flex w-full flex-col items-center justify-center px-6 text-white sm:w-[500px]"
+    class="flex min-h-0 w-full flex-1 items-center justify-center px-4 text-white [container-type:size]"
   >
     <div
-      class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border"
+      class="relative flex size-[min(100cqw,100cqh,500px)] items-center justify-center overflow-hidden rounded-3xl border border-white/20 bg-neutral-900"
     >
       <video
         ref="videoRef"
@@ -55,7 +56,7 @@
 
         <button
           type="button"
-          class="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white"
+          class="pressable absolute right-2 top-2 min-h-11 rounded-full bg-black/60 px-4 text-sm font-semibold text-white backdrop-blur-sm"
           :aria-pressed="whiteReference !== null"
           @click="toggleWhiteBalance()"
         >
@@ -73,7 +74,7 @@
           <p>{{ errorMessage }}</p>
           <button
             type="button"
-            class="rounded-md bg-white px-4 py-2 font-semibold text-black"
+            class="pressable min-h-11 rounded-full bg-white px-5 font-semibold text-black"
             @click="startCamera()"
           >
             Try again
@@ -88,12 +89,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 
+import * as config from "../../constants/config";
+
 import ColorTooltip from "../ColorTooltip";
 import { useCamera } from "../../composables/useCamera";
 import { useVideoColorSampler } from "../../composables/useVideoColorSampler";
 import type { Rgb } from "../../utils/average-color";
 import { getColorName } from "../../utils/color-name";
 import { rgbToHex } from "../../utils/rgb-to-hex";
+import { createStableValue } from "../../utils/stable-value";
 import { applyWhiteBalance } from "../../utils/white-balance";
 
 defineOptions({
@@ -110,10 +114,10 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   /**
-   * Emitted every time the color under the reticle changes, after white
-   * balance correction (`null` when unavailable)
+   * Emitted on every sample with the color under the reticle, after white
+   * balance correction, and the name shown for it (`null` when unavailable)
    */
-  "on-color-captured": [colorHex: string | null];
+  "on-color-captured": [colorHex: string | null, colorName: string | null];
 }>();
 
 const videoRef = ref<HTMLVideoElement | null>(null);
@@ -152,13 +156,31 @@ const colorHex = computed(() => {
   return rgbToHex(r, g, b);
 });
 
-const liveColorName = computed(() =>
-  colorHex.value ? getColorName(colorHex.value) : null,
+const stabilizeColorName = createStableValue<string>(
+  config.COLOR_NAME_STABLE_SAMPLES,
+);
+
+/**
+ * Name of the color under the reticle. It only changes once a few samples in
+ * a row agree, so it does not flicker between neighbors like "Red" and
+ * "Orange". Watches every sample, not just hex changes, so repeats count.
+ */
+const liveColorName = ref<string | null>(null);
+
+watch(
+  color,
+  () => {
+    liveColorName.value = stabilizeColorName(
+      colorHex.value ? getColorName(colorHex.value) : null,
+    );
+
+    // Send the name the user sees, so a capture never names it differently
+    emit("on-color-captured", colorHex.value, liveColorName.value);
+  },
+  { immediate: true },
 );
 
 function toggleWhiteBalance() {
   whiteReference.value = whiteReference.value ? null : rawColor.value;
 }
-
-watch(colorHex, (hex) => emit("on-color-captured", hex));
 </script>

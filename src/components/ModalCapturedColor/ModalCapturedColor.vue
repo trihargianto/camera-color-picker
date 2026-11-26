@@ -6,12 +6,16 @@
     @close="isModalVisible = false"
   >
     <div
-      class="flex h-full w-full items-center justify-center p-4 text-black"
+      class="modal-backdrop flex h-full w-full items-center justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-black"
       :style="{ backgroundColor: colorHexWithHash }"
       @click.self="isModalVisible = false"
     >
+      <!-- Initial focus lands on the card, not the Copy button, so opening the
+           modal does not show a focus ring on a button nobody chose yet -->
       <div
-        class="flex w-80 max-w-full flex-col items-center justify-center rounded-xl bg-white px-7 pb-2 pt-10"
+        autofocus
+        tabindex="-1"
+        class="modal-card flex w-80 max-w-full flex-col items-center justify-center rounded-3xl bg-white px-6 pb-4 pt-10 shadow-2xl outline-none"
       >
         <div
           class="mb-6 h-20 w-20 rounded-full border border-gray-200"
@@ -19,11 +23,11 @@
           aria-hidden="true"
         />
 
-        <p id="captured-color-title" class="mb-1 text-xl font-semibold">
+        <p id="captured-color-title" class="mb-1 text-3xl font-bold">
           {{ props.colorName }}
         </p>
 
-        <p class="text-lg text-gray-500">
+        <p class="select-text text-lg tabular-nums text-gray-500">
           {{ colorHexWithHash }}
         </p>
 
@@ -31,7 +35,7 @@
 
         <button
           type="button"
-          class="mb-1 inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-4 font-semibold text-white hover:bg-blue-500"
+          class="pressable mb-2 inline-flex w-full items-center justify-center rounded-2xl bg-blue-600 px-4 py-4 font-semibold text-white hover:bg-blue-500"
           @click="copyHexColorToClipboard()"
         >
           <svg
@@ -54,7 +58,7 @@
         </button>
         <button
           type="button"
-          class="inline-flex w-full items-center justify-center rounded-md bg-white px-4 py-4 font-semibold text-gray-800"
+          class="pressable inline-flex w-full items-center justify-center rounded-2xl bg-gray-100 px-4 py-4 font-semibold text-gray-800"
           @click="isModalVisible = false"
         >
           Close
@@ -106,7 +110,7 @@ const copyButtonLabel = computed(() => {
     case "failed":
       return "Failed to copy";
     default:
-      return "Copy hex color to clipboard";
+      return "Copy hex code";
   }
 });
 
@@ -152,3 +156,34 @@ async function copyHexColorToClipboard() {
   }, 2000);
 }
 </script>
+
+<style scoped>
+/* Entrance only: the modal opens occasionally, so it earns a short animation.
+   Closing is instant so the camera is back the moment the user is done. */
+dialog[open] .modal-backdrop {
+  animation: modal-fade 200ms var(--ease-out);
+}
+
+dialog[open] .modal-card {
+  animation: modal-pop 240ms var(--ease-out);
+}
+
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] .modal-card {
+    animation: modal-fade 200ms ease;
+  }
+}
+</style>

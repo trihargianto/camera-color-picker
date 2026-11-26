@@ -1,21 +1,22 @@
 <template>
-  <main class="flex h-full w-full flex-col justify-center bg-black">
+  <!-- Full-height camera screen, padded away from the notch and home indicator -->
+  <main
+    class="flex h-full w-full flex-col items-center gap-5 bg-black pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[max(1rem,env(safe-area-inset-top))]"
+  >
     <AppLogo />
 
-    <div class="container mx-auto flex flex-col items-center justify-center">
-      <CameraColorCapture
-        :is-front-camera="isFrontCamera"
-        @on-color-captured="setLiveColorHex"
-      />
+    <CameraColorCapture
+      :is-front-camera="isFrontCamera"
+      @on-color-captured="setLiveColor"
+    />
 
-      <CameraActionButtons
-        :captured-color-hex-by-user="capturedColorHexByUser"
-        :is-shutter-disabled="!liveColorHex"
-        @on-click-captured-color-button="showModalCapturedColor()"
-        @on-click-flip-camera-button="flipCamera()"
-        @on-click-shutter-button="captureColorByUser()"
-      />
-    </div>
+    <CameraActionButtons
+      :captured-color-hex-by-user="capturedColorHexByUser"
+      :is-shutter-disabled="!liveColorHex"
+      @on-click-captured-color-button="showModalCapturedColor()"
+      @on-click-flip-camera-button="flipCamera()"
+      @on-click-shutter-button="captureColorByUser()"
+    />
 
     <ModalCapturedColor
       v-model="isModalCapturedColorVisible"
@@ -42,7 +43,7 @@ const {
   capturedColorHexByUser,
   capturedColorNameByUser,
   captureColorByUser,
-  setLiveColorHex,
+  setLiveColor,
 } = useColorCapturerByUser(showModalCapturedColor);
 
 function showModalCapturedColor() {

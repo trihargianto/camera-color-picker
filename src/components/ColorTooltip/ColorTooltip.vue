@@ -1,15 +1,22 @@
 <template>
-  <div class="flex flex-col items-center">
+  <!-- The outline keeps the tooltip visible over a scene of the same color -->
+  <div
+    class="flex flex-col items-center [filter:drop-shadow(0_0_1px_#fff)_drop-shadow(0_2px_6px_rgba(0,0,0,0.45))]"
+  >
     <div
-      class="flex min-w-[120px] flex-col items-center justify-center rounded-lg px-3 py-1 text-center shadow-md"
+      class="flex min-w-[128px] flex-col items-center justify-center rounded-xl px-4 py-1.5 text-center"
       :style="{ backgroundColor: hexWithHash, color: textColor }"
     >
-      <p class="text-xs font-semibold">{{ hexWithHash }}</p>
-      <p v-if="$slots.default" class="text-[11px]"><slot /></p>
+      <p v-if="$slots.default" class="text-base font-bold leading-tight">
+        <slot />
+      </p>
+      <p class="text-xs font-medium tabular-nums opacity-80">
+        {{ hexWithHash }}
+      </p>
     </div>
 
     <div
-      class="h-0 w-0 border-l-[10px] border-r-[10px] border-t-[10px] border-solid border-l-transparent border-r-transparent"
+      class="-mt-px h-0 w-0 border-l-[10px] border-r-[10px] border-t-[10px] border-solid border-l-transparent border-r-transparent"
       :style="{ borderTopColor: hexWithHash }"
       aria-hidden="true"
     />

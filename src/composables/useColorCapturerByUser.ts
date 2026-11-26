@@ -1,9 +1,9 @@
 import { ref } from "vue";
 import { playCameraShutterSound } from "../utils/sound-player";
-import { getColorName } from "../utils/color-name";
 
 export function useColorCapturerByUser(onCaptured: () => void) {
   const liveColorHex = ref<string | null>(null);
+  const liveColorName = ref<string | null>(null);
   const capturedColorHexByUser = ref<string | null>(null);
   const capturedColorNameByUser = ref<string | null>(null);
 
@@ -16,14 +16,19 @@ export function useColorCapturerByUser(onCaptured: () => void) {
 
     playCameraShutterSound();
 
+    // A short tap on phones that support it (Android). No-op elsewhere.
+    navigator.vibrate?.(10);
+
     capturedColorHexByUser.value = hex;
-    capturedColorNameByUser.value = getColorName(hex);
+    // The name already on screen, not a fresh lookup, so the two always match
+    capturedColorNameByUser.value = liveColorName.value;
 
     onCaptured();
   }
 
-  function setLiveColorHex(colorHex: string | null) {
+  function setLiveColor(colorHex: string | null, colorName: string | null) {
     liveColorHex.value = colorHex;
+    liveColorName.value = colorName;
   }
 
   return {
@@ -31,6 +36,6 @@ export function useColorCapturerByUser(onCaptured: () => void) {
     capturedColorHexByUser,
     capturedColorNameByUser,
     captureColorByUser,
-    setLiveColorHex,
+    setLiveColor,
   };
 }

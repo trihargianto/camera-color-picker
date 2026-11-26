@@ -2,12 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
-body,
+:root {
+  /* Strong ease-out for UI entrances and press feedback */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 html {
+  /* No gray flash on tap. Every button has its own :active state instead. */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
   height: 100%;
+  /* The app is a single screen: no pull-to-refresh or rubber band */
+  overscroll-behavior: none;
+}
+
+#app {
+  /* Track the visible area as the mobile URL bar shows and hides */
+  height: 100dvh;
 }
 
 /* Disable double-tap "zoom" option in browser on touch devices https://stackoverflow.com/a/54207844 */
 * {
   touch-action: manipulation;
+}
+
+/* Long-press on a control should not select its label */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Press feedback: respond the moment the finger lands */
+.pressable {
+  transition:
+    transform 140ms var(--ease-out),
+    opacity 140ms ease;
+}
+
+.pressable:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable:active:not(:disabled) {
+    transform: none;
+    opacity: 0.7;
+  }
 }

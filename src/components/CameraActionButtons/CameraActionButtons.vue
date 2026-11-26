@@ -1,10 +1,10 @@
 <template>
-  <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
+  <div class="flex w-full items-center justify-center gap-14">
     <div v-if="!props.capturedColorHexByUser" class="w-12" />
     <button
       v-else
       type="button"
-      class="h-12 w-12 rounded-sm border border-white"
+      class="pressable h-12 w-12 rounded-xl border-2 border-white"
       :style="{
         backgroundColor: `#${normalizeHex(props.capturedColorHexByUser)}`,
       }"
@@ -15,7 +15,7 @@
     <div class="flex items-center justify-center rounded-full bg-white p-1">
       <button
         type="button"
-        class="h-20 w-20 rounded-full border-2 border-black bg-gradient-to-r from-[rgb(131,58,180)] via-[rgb(253,29,29)] to-[rgb(252,176,69)] transition-opacity active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        class="pressable h-20 w-20 rounded-full border-2 border-black bg-gradient-to-r from-[rgb(131,58,180)] via-[rgb(253,29,29)] to-[rgb(252,176,69)] disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Capture color"
         :disabled="props.isShutterDisabled"
         @click="emit('on-click-shutter-button')"
@@ -24,7 +24,7 @@
 
     <button
       type="button"
-      class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(255,255,255,0.5)] text-center text-white"
+      class="pressable inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-center text-white"
       aria-label="Switch camera"
       @click="emit('on-click-flip-camera-button')"
     >
