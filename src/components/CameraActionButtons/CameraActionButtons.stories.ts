@@ -27,13 +27,17 @@ export const Default: Story = {
       };
     },
     template: `
-      <CameraActionButtons 
-        v-bind="args" 
-        @on-click-shutter-button="onClickShutterButton" 
-        @on-click-flip-camera-button="onClickFlipCameraButton" 
-        @on-click-captured-color-button="onClickCapturedColorButton" 
+      <CameraActionButtons
+        v-bind="args"
+        @on-click-shutter-button="onClickShutterButton"
+        @on-click-flip-camera-button="onClickFlipCameraButton"
+        @on-click-captured-color-button="onClickCapturedColorButton"
       />`,
   }),
+  args: {
+    capturedColorHexByUser: "#4F46E5",
+    isShutterDisabled: false,
+  },
   argTypes: {
     capturedColorHexByUser: { control: "color" },
   },

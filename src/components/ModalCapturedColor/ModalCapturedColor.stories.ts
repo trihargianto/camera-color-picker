@@ -4,6 +4,11 @@ import ModalCapturedColor from "./ModalCapturedColor.vue";
 
 const meta: Meta<typeof ModalCapturedColor> = {
   component: ModalCapturedColor,
+  parameters: {
+    // The modal opens with `showModal()`, so render each story in its own
+    // iframe. Otherwise several modals stack and block the docs page.
+    docs: { story: { inline: false, iframeHeight: 500 } },
+  },
 };
 
 export default meta;
@@ -25,8 +30,25 @@ export const Default: Story = {
     modelValue: true,
     colorHex: "#ff0000",
     colorName: "Red",
+    isLoading: false,
+    errorMessage: null,
   },
   argTypes: {
     colorHex: { control: "color" },
+  },
+};
+
+export const Loading: Story = {
+  ...Default,
+  args: { ...Default.args, colorName: null, isLoading: true },
+};
+
+export const WithError: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    colorName: "Unknown Color",
+    errorMessage:
+      "Could not fetch color name. Please check your internet connection and try again.",
   },
 };

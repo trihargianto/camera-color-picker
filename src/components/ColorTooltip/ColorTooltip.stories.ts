@@ -16,12 +16,12 @@ export const Default: Story = {
     setup() {
       return { args };
     },
-    template: '<ColorTooltip v-bind="args" />',
+    template: '<ColorTooltip v-bind="args">Red</ColorTooltip>',
   }),
   decorators: [
     () => ({ template: '<div style="margin: 4em;"><story/></div>' }),
   ],
   args: {
-    hexColor: "#f00",
+    hexColor: "#FF0000",
   },
 };
