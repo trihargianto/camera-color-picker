@@ -1,56 +1,65 @@
 import { ref } from "vue";
 import { playCameraShutterSound } from "../utils/sound-player";
-import { getBasicColorNameByHex } from "../api/endpoints/colornames";
+import { getCachedBasicColorNameByHex } from "../api/endpoints/colornames";
 
-export function useColorCapturerByUser(showModalCapturedColor: Function) {
-  const capturedColorHex = ref<string>("");
-  const capturedColorHexByUser = ref<string>("");
-  const capturedColorNameByUser = ref<string | null>("");
-  const capturedColorError = ref<string | null>("");
-  const colorNameCache = new Map<string, string>();
+export function useColorCapturerByUser(onCaptured: () => void) {
+  const liveColorHex = ref<string | null>(null);
+  const capturedColorHexByUser = ref<string | null>(null);
+  const capturedColorNameByUser = ref<string | null>(null);
+  const capturedColorError = ref<string | null>(null);
+  const isFetchingColorName = ref<boolean>(false);
+
+  let captureId = 0;
 
   async function captureColorByUser() {
+    const hex = liveColorHex.value;
+
+    if (!hex) {
+      return;
+    }
+
     playCameraShutterSound();
 
-    const hexKey = capturedColorHex.value;
+    const currentCaptureId = ++captureId;
 
-    // Reset error state
+    capturedColorHexByUser.value = hex;
+    capturedColorNameByUser.value = null;
     capturedColorError.value = null;
+    isFetchingColorName.value = true;
 
-    // Check cache first
-    if (colorNameCache.has(hexKey)) {
-      capturedColorNameByUser.value = colorNameCache.get(hexKey) || null;
-    } else {
-      try {
-        const response = await getBasicColorNameByHex(hexKey);
-        const colorName = response.data.paletteTitle;
+    onCaptured();
 
-        // Store in cache
-        colorNameCache.set(hexKey, colorName);
-        capturedColorNameByUser.value = colorName;
-      } catch (err) {
+    try {
+      const name = await getCachedBasicColorNameByHex(hex);
+
+      if (currentCaptureId === captureId) {
+        capturedColorNameByUser.value = name;
+      }
+    } catch (err) {
+      if (currentCaptureId === captureId) {
         console.error("Error fetching color name:", err);
         capturedColorNameByUser.value = "Unknown Color";
         capturedColorError.value =
           "Could not fetch color name. Please check your internet connection and try again.";
       }
+    } finally {
+      if (currentCaptureId === captureId) {
+        isFetchingColorName.value = false;
+      }
     }
-
-    capturedColorHexByUser.value = capturedColorHex.value;
-
-    showModalCapturedColor();
   }
 
-  function setCapturedColorHex(colorHex: string) {
-    capturedColorHex.value = colorHex;
+  function setLiveColorHex(colorHex: string | null) {
+    liveColorHex.value = colorHex;
   }
 
   return {
-    capturedColorHex,
+    liveColorHex,
     capturedColorHexByUser,
     capturedColorNameByUser,
     capturedColorError,
+    isFetchingColorName,
     captureColorByUser,
-    setCapturedColorHex,
+    setLiveColorHex,
   };
 }

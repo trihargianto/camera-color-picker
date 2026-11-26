@@ -1,15 +1,16 @@
 <template>
-  <div class="flex h-full w-full flex-col justify-center bg-black">
+  <main class="flex h-full w-full flex-col justify-center bg-black">
     <AppLogo />
 
     <div class="container mx-auto flex flex-col items-center justify-center">
       <CameraColorCapture
         :is-front-camera="isFrontCamera"
-        @on-color-captured="setCapturedColorHex"
+        @on-color-captured="setLiveColorHex"
       />
 
       <CameraActionButtons
         :captured-color-hex-by-user="capturedColorHexByUser"
+        :is-shutter-disabled="!liveColorHex"
         @on-click-captured-color-button="showModalCapturedColor()"
         @on-click-flip-camera-button="flipCamera()"
         @on-click-shutter-button="captureColorByUser()"
@@ -21,8 +22,9 @@
       :color-hex="capturedColorHexByUser"
       :color-name="capturedColorNameByUser"
       :error-message="capturedColorError"
+      :is-loading="isFetchingColorName"
     />
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -34,41 +36,24 @@ import CameraActionButtons from "./components/CameraActionButtons";
 import ModalCapturedColor from "./components/ModalCapturedColor";
 import { useColorCapturerByUser } from "./composables/useColorCapturerByUser";
 
-const { isModalCapturedColorVisible, showModalCapturedColor } = useModal();
-const { isFrontCamera, flipCamera } = useCameraHandler();
+const isModalCapturedColorVisible = ref<boolean>(false);
+const isFrontCamera = ref<boolean>(false);
 
 const {
+  liveColorHex,
   capturedColorHexByUser,
   capturedColorNameByUser,
   capturedColorError,
-  setCapturedColorHex,
+  isFetchingColorName,
   captureColorByUser,
+  setLiveColorHex,
 } = useColorCapturerByUser(showModalCapturedColor);
 
-function useCameraHandler() {
-  const isFrontCamera = ref<boolean>(false);
-
-  function flipCamera() {
-    isFrontCamera.value = !isFrontCamera.value;
-  }
-
-  return {
-    isFrontCamera,
-    flipCamera,
-  };
+function showModalCapturedColor() {
+  isModalCapturedColorVisible.value = true;
 }
 
-function useModal() {
-  const isModalCapturedColorVisible = ref<boolean>(false);
-
-  function showModalCapturedColor() {
-    isModalCapturedColorVisible.value = true;
-  }
-
-  return {
-    isModalCapturedColorVisible,
-    showModalCapturedColor,
-  };
+function flipCamera() {
+  isFrontCamera.value = !isFrontCamera.value;
 }
 </script>
-./components/CameraColorCapture

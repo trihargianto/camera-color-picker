@@ -1,34 +1,32 @@
 <template>
   <div class="my-3 mt-12 flex w-full items-center justify-center gap-14">
-    <div v-if="!props.capturedColorHexByUser" class="w-11" />
-    <div
+    <div v-if="!props.capturedColorHexByUser" class="w-12" />
+    <button
       v-else
-      class="h-11 w-11 rounded-sm border border-white"
-      :style="`background: ${props.capturedColorHexByUser}`"
-      role="button"
-      @click="$emit('on-click-captured-color-button')"
+      type="button"
+      class="h-12 w-12 rounded-sm border border-white"
+      :style="{
+        backgroundColor: `#${normalizeHex(props.capturedColorHexByUser)}`,
+      }"
+      :aria-label="`Show last captured color #${normalizeHex(props.capturedColorHexByUser)}`"
+      @click="emit('on-click-captured-color-button')"
     />
 
     <div class="flex items-center justify-center rounded-full bg-white p-1">
-      <div
-        class="h-20 w-20 cursor-pointer rounded-full border-2 border-black bg-white"
-        style="
-          background: rgb(131, 58, 180);
-          background: linear-gradient(
-            90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%
-          );
-        "
-        role="button"
-        @click="$emit('on-click-shutter-button')"
+      <button
+        type="button"
+        class="h-20 w-20 rounded-full border-2 border-black bg-gradient-to-r from-[rgb(131,58,180)] via-[rgb(253,29,29)] to-[rgb(252,176,69)] transition-opacity active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        aria-label="Capture color"
+        :disabled="props.isShutterDisabled"
+        @click="emit('on-click-shutter-button')"
       />
     </div>
 
     <button
+      type="button"
       class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(255,255,255,0.5)] text-center text-white"
-      @click="$emit('on-click-flip-camera-button')"
+      aria-label="Switch camera"
+      @click="emit('on-click-flip-camera-button')"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -37,6 +35,7 @@
         stroke-width="1.5"
         stroke="currentColor"
         class="h-6 w-6"
+        aria-hidden="true"
       >
         <path
           stroke-linecap="round"
@@ -49,36 +48,28 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
+import { normalizeHex } from "../../utils/rgb-to-hex";
 
 defineOptions({
   name: "CameraActionButtons",
 });
 
-const emit = defineEmits([
-  /**
-   * Emitted when the shutter button is clicked.
-   */
-  "on-click-shutter-button",
+const props = withDefaults(
+  defineProps<{
+    /** Last color captured by the user (hex, with or without `#`) */
+    capturedColorHexByUser: string | null;
+    /** Disable the shutter, e.g. while the camera is not ready */
+    isShutterDisabled?: boolean;
+  }>(),
+  { isShutterDisabled: false },
+);
 
-  /**
-   * Emitted when the flip camera button is clicked.
-   */
-  "on-click-flip-camera-button",
-
-  /**
-   * Emitted when the captured color button is clicked.
-   */
-  "on-click-captured-color-button",
-]);
-
-const props = defineProps({
-  /**
-   * Captured color hex by user.
-   */
-  capturedColorHexByUser: {
-    type: [String, null] as PropType<string | null>,
-    required: true,
-  },
-});
+const emit = defineEmits<{
+  /** Emitted when the shutter button is clicked */
+  "on-click-shutter-button": [];
+  /** Emitted when the flip camera button is clicked */
+  "on-click-flip-camera-button": [];
+  /** Emitted when the captured color button is clicked */
+  "on-click-captured-color-button": [];
+}>();
 </script>
