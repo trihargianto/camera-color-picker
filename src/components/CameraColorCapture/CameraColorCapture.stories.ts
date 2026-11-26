@@ -22,6 +22,12 @@ export const Default: Story = {
     template:
       '<CameraColorCapture v-bind="args" @on-color-captured="onColorCaptured" />',
   }),
+  decorators: [
+    () => ({
+      template:
+        '<div style="height: 500px; display: flex; flex-direction: column;"><story/></div>',
+    }),
+  ],
   args: {
     isFrontCamera: true,
   },
