@@ -21,8 +21,6 @@
       v-model="isModalCapturedColorVisible"
       :color-hex="capturedColorHexByUser"
       :color-name="capturedColorNameByUser"
-      :error-message="capturedColorError"
-      :is-loading="isFetchingColorName"
     />
   </main>
 </template>
@@ -43,8 +41,6 @@ const {
   liveColorHex,
   capturedColorHexByUser,
   capturedColorNameByUser,
-  capturedColorError,
-  isFetchingColorName,
   captureColorByUser,
   setLiveColorHex,
 } = useColorCapturerByUser(showModalCapturedColor);

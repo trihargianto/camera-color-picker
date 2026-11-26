@@ -25,7 +25,7 @@
           aria-hidden="true"
         >
           <ColorTooltip :hex-color="colorHex">
-            {{ liveColorName ?? "…" }}
+            {{ liveColorName }}
           </ColorTooltip>
         </div>
 
@@ -52,6 +52,15 @@
             />
           </svg>
         </div>
+
+        <button
+          type="button"
+          class="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white"
+          :aria-pressed="whiteReference !== null"
+          @click="toggleWhiteBalance()"
+        >
+          {{ whiteReference ? "Reset white" : "Calibrate white" }}
+        </button>
       </template>
 
       <div
@@ -77,12 +86,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 import ColorTooltip from "../ColorTooltip";
 import { useCamera } from "../../composables/useCamera";
 import { useVideoColorSampler } from "../../composables/useVideoColorSampler";
-import { useLiveColorName } from "../../composables/useLiveColorName";
+import type { Rgb } from "../../utils/average-color";
+import { getColorName } from "../../utils/color-name";
+import { rgbToHex } from "../../utils/rgb-to-hex";
+import { applyWhiteBalance } from "../../utils/white-balance";
 
 defineOptions({
   name: "CameraColorCapture",
@@ -97,7 +109,10 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  /** Emitted every time the color under the reticle changes (`null` when unavailable) */
+  /**
+   * Emitted every time the color under the reticle changes, after white
+   * balance correction (`null` when unavailable)
+   */
   "on-color-captured": [colorHex: string | null];
 }>();
 
@@ -108,12 +123,42 @@ const { status, errorMessage, startCamera } = useCamera(
   videoRef,
 );
 
-const { color, colorHex } = useVideoColorSampler(
+const { color: rawColor } = useVideoColorSampler(
   videoRef,
   () => status.value === "ready",
 );
 
-const { liveColorName } = useLiveColorName(color);
+/**
+ * A sample of something white or gray, taken when the user taps
+ * "Calibrate white". Used to cancel out the color of the light in the room.
+ */
+const whiteReference = ref<Rgb | null>(null);
+
+const color = computed(() => {
+  if (!rawColor.value || !whiteReference.value) {
+    return rawColor.value;
+  }
+
+  return applyWhiteBalance(rawColor.value, whiteReference.value);
+});
+
+const colorHex = computed(() => {
+  if (!color.value) {
+    return null;
+  }
+
+  const { r, g, b } = color.value;
+
+  return rgbToHex(r, g, b);
+});
+
+const liveColorName = computed(() =>
+  colorHex.value ? getColorName(colorHex.value) : null,
+);
+
+function toggleWhiteBalance() {
+  whiteReference.value = whiteReference.value ? null : rawColor.value;
+}
 
 watch(colorHex, (hex) => emit("on-color-captured", hex));
 </script>

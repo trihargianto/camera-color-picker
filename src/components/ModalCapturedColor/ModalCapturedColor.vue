@@ -19,43 +19,13 @@
           aria-hidden="true"
         />
 
-        <p
-          id="captured-color-title"
-          class="mb-1 text-xl font-semibold"
-          aria-live="polite"
-        >
-          <span v-if="props.isLoading" class="text-gray-500">
-            Finding color name…
-          </span>
-          <template v-else>{{ props.colorName }}</template>
+        <p id="captured-color-title" class="mb-1 text-xl font-semibold">
+          {{ props.colorName }}
         </p>
 
         <p class="text-lg text-gray-500">
           {{ colorHexWithHash }}
         </p>
-
-        <div
-          v-if="props.errorMessage"
-          class="mt-4 flex items-start rounded-md bg-red-50 px-4 py-3 text-sm text-red-800"
-          role="alert"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="mr-2 mt-0.5 h-5 w-5 flex-shrink-0"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-            />
-          </svg>
-          <span>{{ props.errorMessage }}</span>
-        </div>
 
         <div class="mb-6" />
 
@@ -111,16 +81,10 @@ const props = withDefaults(
     colorHex?: string | null;
     /** Color name */
     colorName?: string | null;
-    /** Error message to display */
-    errorMessage?: string | null;
-    /** Set to `true` while the color name is being fetched */
-    isLoading?: boolean;
   }>(),
   {
     colorHex: null,
     colorName: null,
-    errorMessage: null,
-    isLoading: false,
   },
 );
 

@@ -1,8 +1,7 @@
-import { ref, computed, onMounted, onUnmounted, type Ref } from "vue";
+import { ref, onMounted, onUnmounted, type Ref } from "vue";
 
 import * as config from "../constants/config";
 import { averageColor, type Rgb } from "../utils/average-color";
-import { rgbToHex } from "../utils/rgb-to-hex";
 
 /**
  * Samples the average color of a small square at the center of a playing video.
@@ -12,16 +11,6 @@ export function useVideoColorSampler(
   isEnabled: () => boolean,
 ) {
   const color = ref<Rgb | null>(null);
-
-  const colorHex = computed(() => {
-    if (!color.value) {
-      return null;
-    }
-
-    const { r, g, b } = color.value;
-
-    return rgbToHex(r, g, b);
-  });
 
   const size = config.COLOR_SAMPLE_SIZE;
 
@@ -73,5 +62,5 @@ export function useVideoColorSampler(
     }
   }
 
-  return { color, colorHex };
+  return { color };
 }

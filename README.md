@@ -12,6 +12,12 @@ But why on earth this tool was built in the first place? This is because I need 
 
 📓 Storybook: [camera-color-picker-storybook.vercel.app](https://camera-color-picker-storybook.vercel.app/)
 
+## How it works
+
+- The app averages a small square at the center of the camera view.
+- The color is named offline: [culori](https://culori.js.org) picks the closest entry in `src/constants/color-names.ts` using CIEDE2000, a formula for how different two colors look to the human eye. Edit that list to change the names.
+- Lighting tints everything (warm bulbs make white look yellow). Point the camera at something white or gray, like paper, and tap **Calibrate white** to cancel the tint. Tap **Reset white** when the lighting changes.
+
 ## Local Installation
 
 Requires Node.js 22 (see `.nvmrc`) and [pnpm](https://pnpm.io) (enable it with `corepack enable`).
