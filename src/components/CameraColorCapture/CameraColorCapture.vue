@@ -124,7 +124,8 @@
               Try again
             </button>
           </template>
-          <p v-else>Initializing camera...</p>
+          <p v-else-if="status === 'ready'">Reading the first color…</p>
+          <p v-else>Starting camera… Allow access if your browser asks.</p>
         </div>
       </div>
     </div>
@@ -242,6 +243,8 @@ watch(reticle.position, () => {
   hasMovedReticle.value ||= !reticle.isCentered.value;
   requestSample();
 });
+
+watch(status, requestSample);
 
 // A frozen frame belongs to the camera it came from
 watch([status, () => props.isFrontCamera], () => {

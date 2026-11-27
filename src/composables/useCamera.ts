@@ -1,6 +1,8 @@
 import { ref, onMounted, onUnmounted, watch, type Ref } from "vue";
 import * as config from "../constants/config";
 
+const CAMERA_START_TIMEOUT_MS = 30_000;
+
 export type CameraStatus = "idle" | "starting" | "ready" | "error" | "disabled";
 
 function getCameraErrorMessage(error: unknown) {
@@ -37,6 +39,7 @@ export function useCamera(
   const errorMessage = ref<string | null>(null);
 
   let mediaStream: MediaStream | null = null;
+  let startupTimer: number | undefined;
 
   // Incremented on every start/stop so a slow `getUserMedia` call that resolves
   // after a newer start (or after unmount) can be detected and discarded.
@@ -59,7 +62,13 @@ export function useCamera(
   async function startCamera() {
     stopCamera();
 
-    const currentRequestId = ++requestId;
+    const currentRequestId = requestId;
+    startupTimer = window.setTimeout(() => {
+      stopCamera();
+      status.value = "error";
+      errorMessage.value =
+        "Camera startup timed out. Check camera permission in your browser and try again.";
+    }, CAMERA_START_TIMEOUT_MS);
 
     status.value = "starting";
     errorMessage.value = null;
@@ -80,9 +89,19 @@ export function useCamera(
 
       mediaStream = stream;
 
-      if (videoRef.value) {
-        videoRef.value.srcObject = stream;
+      const video = videoRef.value;
+      if (!video) {
+        throw new Error("Camera preview is unavailable.");
       }
+
+      video.srcObject = stream;
+      await video.play();
+
+      if (currentRequestId !== requestId) {
+        return;
+      }
+
+      window.clearTimeout(startupTimer);
 
       status.value = "ready";
     } catch (error) {
@@ -90,15 +109,23 @@ export function useCamera(
         return;
       }
 
-      console.error("getUserMedia() error: ", error);
+      console.error("Camera startup failed", error);
+      const message =
+        mediaStream &&
+        error instanceof DOMException &&
+        error.name === "NotAllowedError"
+          ? "Camera playback was blocked. Tap Try again to restart the preview."
+          : getCameraErrorMessage(error);
+      stopCamera();
 
       status.value = "error";
-      errorMessage.value = getCameraErrorMessage(error);
+      errorMessage.value = message;
     }
   }
 
   function stopCamera() {
     requestId++;
+    window.clearTimeout(startupTimer);
 
     mediaStream?.getTracks().forEach((track) => track.stop());
     mediaStream = null;
